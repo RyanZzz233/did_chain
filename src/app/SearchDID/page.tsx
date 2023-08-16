@@ -1,34 +1,38 @@
-"use client";
-
+"use client"
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
-import { debounce } from "perfect-debounce";
 import Loading1 from "@/components/loading/Loading1";
-import styles from './page.module.css'
+import styles from "./page.module.css";
 
-const SearchDID = () => {
-  useEffect(() => {
-    document.title = "Metopia | SearchDID";
-  }, []);
+//@ts-ignore
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-  //@ts-expect-error
-  const fetcher = (...args:any) => fetch(...args).then((res) => res.json());
-  // const fetcher = debounce(async (...args) => {
-  //   // @ts-expect-error
-  //   const res = await fetch(...args);
-  //   return res.json();
-  // }, 1000);
+const Search = () => {
 
+  const [searchType, setSearchType] = useState("domain");
   const [inputValue, setInputValue] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
+  useEffect(() => {
+    document.title = "Metopia | " + searchType;
+  }, [searchType]);
+
+  const apiEndpoint = `/api/userlocal?key=${encodeURIComponent(searchType)}&value=${encodeURIComponent(searchInput)}`;
+
   const { data, mutate, error, isLoading } = useSWR(
-    searchInput ? `/api/didlocal?domain=${encodeURIComponent(searchInput)}` : null,
+    searchInput ? apiEndpoint : null,
     fetcher
   );
 
-  const handleInputChange = (event: any) => {
+  const handleSearchTypeChange = (event:any) => {
+    setSearchType(event.target.value);
+    setInputValue("");
+    setSearchInput("");
+    setHasSearched(false);
+  };
+
+  const handleInputChange = (event:any) => {
     setInputValue(event.target.value);
   };
 
@@ -36,9 +40,6 @@ const SearchDID = () => {
     setSearchInput(inputValue);
     setHasSearched(true);
   };
-
-
-  // your existing handleSubmit function
 
   return (
     <div className="relative">
@@ -55,19 +56,26 @@ const SearchDID = () => {
             height: "100px",
           }}
         >
-          Searcher by DID
+          {/* {searchType === "domain" ? "Search by DID": "Search by User"} */}
+          Web3.0 DID Searcher
         </h1>
-
+        <div className="pb-10">
+          <select value={searchType} onChange={handleSearchTypeChange}>
+            <option value="domain">Search by DID</option>
+            <option value="owner">Search by User</option>
+          </select>
+        </div>
         <div className="flex flex-wrap">
           <div className="">
             <div className="">
-              {/* <h1 className="text-2xl pb-8 text-apple-black font-light">
-                Search the owner of DID
-              </h1> */}
               <div className={styles.inputwrapper}>
                 <input
                   type="text"
-                  placeholder="Enter a DID to search user"
+                  placeholder={
+                    searchType === "domain"
+                      ? "Enter a DID to get User"
+                      : "Enter a User to get DID"
+                  }
                   value={inputValue}
                   onChange={handleInputChange}
                   onKeyPress={(event) => {
@@ -101,34 +109,33 @@ const SearchDID = () => {
                   </svg>
                 </button>
               </div>
-              {isLoading ? (
-                <Loading1 />
-              ) : (
-                data?.length > 0 ? (
-                  data?.map((post: any) => (
-                    <div className="flex items-center pb-4" key={post._id}>
-                      <div className="">
-                        {/* <img
-                          src={post.img}
-                          alt=""
-                          className="w-full h-32 object-contain"
-                        /> */}
-                      </div>
-
+            {isLoading ? (
+            <Loading1 />
+            ) : (
+              data?.length > 0 ? (
+                data.map((post:any) => (
+                  <div className="flex items-center pb-4" key={post._id}>
+                    <div className="">
                       <div className="flex items-center">
-                        <h2 className="text-lg text-apple-black font-light">
-                          DID: {post.domain}
-                        </h2>
-                        <h2 className="text-sm text-apple-black font-light pl-4">
-                          Owner Address: {post.owner}
-                        </h2>
+                        <div className="text-lg text-apple-black font-light">
+                          <h2>
+                            <strong>Domain:</strong> {post.domain}
+                          </h2>
+                          <h2>
+                            <strong>Owner:</strong> {post.owner}
+                          </h2>
+                          <h2>
+                            <strong>Expiry Date:</strong> {post.expiryDate}
+                          </h2>
+                        </div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  hasSearched && <div>No data matched, please retry.</div>
-                )
-              )}
+                  </div>
+                ))
+              ) : (
+                hasSearched && <div>No data matched, please retry.</div>
+              )
+            )}
             </div>
           </div>
         </div>
@@ -137,4 +144,4 @@ const SearchDID = () => {
   );
 };
 
-export default SearchDID;
+export default Search;

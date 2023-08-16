@@ -1,35 +1,38 @@
-"use client";
-
+"use client"
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
-import { debounce } from "perfect-debounce";
 import Loading1 from "@/components/loading/Loading1";
 import styles from "./page.module.css";
 
-const SearchUser = () => {
-  useEffect(() => {
-    document.title = "Metopia | SearchUser";
-  }, []);
+//@ts-ignore
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-  //@ts-expect-error
-  const fetcher = (...args:any) => fetch(...args).then((res) => res.json());
+const Search = () => {
 
-  // const fetcher = debounce(async (...args) => {
-  //   // @ts-expect-error
-  //   const res = await fetch(...args);
-  //   return res.json();
-  // }, 0);
-
+  const [searchType, setSearchType] = useState("domain");
   const [inputValue, setInputValue] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
+  useEffect(() => {
+    document.title = "Metopia | " + searchType;
+  }, [searchType]);
+
+  const apiEndpoint = `/api/didlocal?key=${encodeURIComponent(searchType)}&value=${encodeURIComponent(searchInput)}`;
+
   const { data, mutate, error, isLoading } = useSWR(
-    searchInput ? `/api/userlocal?owner=${encodeURIComponent(searchInput)}` : null,
+    searchInput ? apiEndpoint : null,
     fetcher
   );
 
-  const handleInputChange = (event: any) => {
+  const handleSearchTypeChange = (event:any) => {
+    setSearchType(event.target.value);
+    setInputValue("");
+    setSearchInput("");
+    setHasSearched(false);
+  };
+
+  const handleInputChange = (event:any) => {
     setInputValue(event.target.value);
   };
 
@@ -37,8 +40,6 @@ const SearchUser = () => {
     setSearchInput(inputValue);
     setHasSearched(true);
   };
-
-  // your existing handleSubmit function
 
   return (
     <div className="relative">
@@ -55,19 +56,29 @@ const SearchUser = () => {
             height: "100px",
           }}
         >
-          Searcher by User
+          {/* {searchType === "domain" ? "Search DID": "Search User"} */}
+          Transactions Tracker
         </h1>
-
+        <div className="pb-10">
+          <select value={searchType} onChange={handleSearchTypeChange}>
+            <option value="domain">Search by DID</option>
+            <option value="owner">Search by User</option>
+            <option value="txRef">Search by Transaction ID</option>
+          </select>
+        </div>
         <div className="flex flex-wrap">
           <div className="">
             <div className="">
-              {/* <h1 className="text-2xl pb-8 text-apple-black font-light">
-                Search the owner of DID
-              </h1> */}
               <div className={styles.inputwrapper}>
                 <input
                   type="text"
-                  placeholder="Enter a user to search DID"
+                  placeholder={
+                    searchType === "domain"
+                    ? "Enter a DID"
+                    : searchType === "owner"
+                    ? "Enter a User"
+                    : "Enter a Transaction ID"
+                  }
                   value={inputValue}
                   onChange={handleInputChange}
                   onKeyPress={(event) => {
@@ -105,20 +116,33 @@ const SearchUser = () => {
             <Loading1 />
             ) : (
               data?.length > 0 ? (
-                data.map((post: any) => (
+                data.map((post:any) => (
                   <div className="flex items-center pb-4" key={post._id}>
                     <div className="">
-                      {/* <img
-                        src={post.img}
-                        alt=""
-                        className="w-full h-32 object-contain"
-                      /> */}
-                    </div>
-
-                    <div className="flex items-center">
-                      <h2 className="text-lg text-apple-black font-light">
-                        DID: {post.domain}
-                      </h2>
+                      <div className="flex items-center">
+                        <div className="text-lg text-apple-black font-light">
+                          <h2>
+                            <strong>Domain:</strong> {post.domain}
+                          </h2>
+                          <h2>
+                            <strong>Owner:</strong> {post.owner}
+                          </h2>
+                          <h2>
+                            <strong>Expiry Date:</strong> {post.expiryDate}
+                          </h2>
+                          <h2>
+                            <strong>Transaction ID:</strong> {post.txRef}
+                          </h2>
+                          <h2>
+                            <strong>Transaction Type:</strong> {post.eventName}
+                          </h2>
+                          {post.oldOwner && (
+                            <h2>
+                              <strong>Old Owner:</strong> {post.oldOwner}
+                            </h2>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -134,4 +158,4 @@ const SearchUser = () => {
   );
 };
 
-export default SearchUser;
+export default Search;

@@ -18,23 +18,17 @@ const links = [
   {
     id: 2,
     title: "Search",
-    url: "/Search",
-    subLinks: [
-      {
-        id: 1,
-        title: "Search by User",
-        url: "/SearchUser",
-      },
-      {
-        id: 2,
-        title: "Search by DID",
-        url: "/SearchDID",
-      },
-    ],
+    url: "/SearchDID",
   },
 
   {
     id: 3,
+    title: "Transactions",
+    url: "/Transactions",
+  },
+
+  {
+    id: 4,
     title: "Dashboard",
     url: "/Dashboard",
   },
@@ -72,23 +66,6 @@ const NavBar = () => {
                 {link.title}
               </div>
             </Link>
-            {pathname.includes("Search") && link.subLinks && (
-              <div className="flex flex-col gap-2 text-apple-black font-bold pl-2 mt-2 text-sm transition-all duration-200 ease-in-out">
-                {link.subLinks.map((subLink) => (
-                  <Link key={subLink.id} href={subLink.url}>
-                    <div
-                      className={
-                        pathname === subLink.url
-                        ? "text-tw-black pl-2 transform-origin-left scale-110 font-normal transition-all duration-200 ease-in-out"
-                        : "transition-all duration-200 ease-in-out hover:text-tw-black font-normal"
-                      }
-                    >
-                      {subLink.title}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         ))}
       </div>

@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     //   : data;
 
     //console.log("check2",filteredData)
-    console.log(data)
+    console.log(666,data)
     return NextResponse.json(data);
   } catch (error) {
     console.error("An error occurred while fetching the data:", error);

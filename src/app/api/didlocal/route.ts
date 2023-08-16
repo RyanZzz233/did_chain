@@ -14,7 +14,7 @@ function hashApiKey() {
   hash.update(SALT);
 
   const result = hash.digest("hex");
-  console.log(result);  // Now this will print the hash result
+  //console.log(result);  // Now this will print the hash result
 
   return result;
 }
@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
     //   : data;
 
     //console.log("check2",filteredData)
+    console.log(data)
     return NextResponse.json(data);
   } catch (error) {
     console.error("An error occurred while fetching the data:", error);

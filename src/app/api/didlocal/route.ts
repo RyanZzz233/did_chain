@@ -6,8 +6,6 @@ function hashApiKey() {
   const API_KEY = process.env.API_KEY;
   const SALT = process.env.SALT;
 
-  console.log(666,API_KEY);
-
   const hash = crypto.createHash("md5");
 
   // @ts-ignore
@@ -15,7 +13,7 @@ function hashApiKey() {
   // @ts-ignore
   hash.update(SALT);
 
-
+  console.log(hash);
   return hash.digest("hex");
 }
 

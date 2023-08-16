@@ -13,7 +13,7 @@ function hashApiKey() {
   // @ts-ignore
   hash.update(SALT);
 
-  console.log(API_KEY);
+  console.log(666,API_KEY);
 
   return hash.digest("hex");
 }

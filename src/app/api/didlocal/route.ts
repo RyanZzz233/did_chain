@@ -14,7 +14,7 @@ function hashApiKey() {
   hash.update(SALT);
 
   const result = hash.digest("hex");
-  //console.log(result);  // Now this will print the hash result
+  console.log(444,result);  // Now this will print the hash result
 
   return result;
 }
@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
         "Auth-Key": authKey,
       },
     });
+    console.log("555", response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

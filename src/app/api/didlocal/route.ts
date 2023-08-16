@@ -13,8 +13,10 @@ function hashApiKey() {
   // @ts-ignore
   hash.update(SALT);
 
-  console.log(hash);
-  return hash.digest("hex");
+  const result = hash.digest("hex");
+  console.log(result);  // Now this will print the hash result
+
+  return result;
 }
 
 export async function GET(request: NextRequest) {
